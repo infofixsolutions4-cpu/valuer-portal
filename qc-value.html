@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Valuer Panel • Vehicle Inspection</title>
+  <!-- Bootstrap 5 + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom mobile style -->
+  <style>
+    body {
+      background: #f2f5f9;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      padding-bottom: 20px;
+    }
+    .app-header {
+      background: linear-gradient(145deg, #0a2e4b, #0a1e2f);
+      color: white;
+      padding: 18px 20px;
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 6px 14px rgba(0,20,40,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+    .status-badge {
+      background: rgba(255,255,255,0.18);
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+    .lead-card {
+      background: white;
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.02);
+      border: 1px solid rgba(0,53,84,0.04);
+      transition: all 0.15s;
+    }
+    .valuation-panel {
+      background: #ffffffec;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 32px;
+      padding: 22px 20px;
+      margin-top: 8px;
+      box-shadow: 0 8px 22px rgba(0,43,80,0.06);
+    }
+    .call-btn {
+      background: #e6f4ea;
+      color: #0e6245;
+      border-radius: 40px;
+      padding: 12px 22px;
+      font-weight: 600;
+      border: none;
+      transition: 0.2s;
+    }
+    .call-btn i {
+      font-size: 1.3rem;
+      margin-right: 8px;
+    }
+    .call-btn:hover {
+      background: #c8eed8;
+    }
+    .remark-box, .alt-number-box {
+      background: #f8fbfe;
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid #e7edf4;
+    }
+    .parameter-card {
+      background: #f8fcff;
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #e2ecf5;
+    }
+    .param-row {
+      margin-bottom: 16px;
+    }
+    .param-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1c4e66;
+      margin-bottom: 6px;
+    }
+    .input-valuation {
+      background: white;
+      border-radius: 18px;
+      border: 1.2px solid #dae2ed;
+      padding: 14px 18px;
+      width: 100%;
+      font-size: 1rem;
+      transition: all 0.1s;
+    }
+    .input-valuation:focus {
+      border-color: #2f8db0;
+      box-shadow: 0 0 0 3px rgba(47,141,176,0.1);
+    }
+    .section-title {
+      font-weight: 650;
+      color: #103f53;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .divider {
+      border-top: 1.5px dashed #cbd5e1;
+      margin: 26px 0 20px;
+      opacity: 0.7;
+    }
+    .photo-param-section {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 16px;
+      margin-top: 16px;
+      border: 1px solid #e1edf2;
+    }
+    .param-chip {
+      background: #edf3f7;
+      padding: 10px 18px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 550;
+      color: #1f5068;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.1s;
+      border: 1.5px solid transparent;
+    }
+    .param-chip.active {
+      background: #0a3346;
+      color: white;
+      border-color: #267a9e;
+    }
+    .param-chip i {
+      font-size: 1rem;
+    }
+    .media-btn {
+      background: #0f2e44;
+      color: white;
+      border-radius: 60px;
+      padding: 16px 24px;
+      font-weight: 600;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      box-shadow: 0 5px 12px rgba(7,58,97,0.2);
+    }
+    .media-btn i {
+      font-size: 1.5rem;
+    }
+    .hidden-input {
+      display: none;
+    }
+    .thumbnail-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .thumb-item {
+      background: #f5faff;
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border: 1px solid #d8e5ed;
+    }
+    .thumb-img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 2px solid white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .thumb-info {
+      flex: 1;
+    }
+    .thumb-param {
+      font-weight: 700;
+      color: #0d4357;
+      margin-bottom: 4px;
+    }
+    .thumb-time {
+      font-size: 0.7rem;
+      color: #5a7e91;
+    }
+    .remove-thumb {
+      color: #a13e3e;
+      background: #ffe9e9;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+    }
+    .save-alt-btn {
+      background: white;
+      border: 1.8px solid #1a5a7a;
+      color: #1a5a7a;
+      border-radius: 40px;
+      padding: 12px 20px;
+      font-weight: 600;
+    }
+    .save-alt-btn:hover {
+      background: #e1ecf2;
+    }
+    .customer-photo {
+      width: 48px;
+      height: 48px;
+      background: #b3d2e3;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #16445c;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .mobile-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .badge-param {
+      background: #d4e7f0;
+      color: #0a3346;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-container">
+    <!-- Sticky header – assigned lead info -->
+    <div class="app-header d-flex justify-content-between align-items-center">
+      <div>
+        <span class="status-badge"><i class="bi bi-check-circle-fill me-1" style="color: #a3e0ff;"></i> Active lead</span>
+        <h5 class="mt-2 mb-0 fw-semibold" style="letter-spacing: -0.2px;">Valuation #VH-3421</h5>
+        <p class="text-white-50 small mb-0">Assigned to: Ravi Verma (you)</p>
+      </div>
+      <div class="customer-photo">
+        <span>JK</span>
+      </div>
+    </div>
+
+    <!-- Main card – Customer & call action -->
+    <div class="p-3">
+      <div class="lead-card">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="fw-bold mb-1">Jitender Kumar</h5>
+            <p class="text-secondary mb-1"><i class="bi bi-geo-alt-fill me-1" style="color:#0d9488;"></i> Sector 17, Chandigarh · 2.4 km</p>
+            <p class="mb-2"><span class="badge bg-light text-dark px-3 py-2 rounded-pill"><i class="bi bi-tag me-1"></i> Hyundai i20 · 2021</span></p>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-warning bg-opacity-25 text-dark px-3 py-2 rounded-pill">⏳ Pending valuation</span>
+          </div>
+        </div>
+        <div class="d-flex gap-3 mt-2">
+          <a href="tel:+919876543210" class="call-btn text-decoration-none flex-fill text-center">
+            <i class="bi bi-telephone-fill"></i> Call customer
+          </a>
+          <button class="btn btn-outline-secondary rounded-pill flex-fill" style="border-radius: 40px !important;" onclick="alert('Open map would open here → integrated navigation')">
+            <i class="bi bi-navigation-fill"></i> Navigate
+          </button>
+        </div>
+      </div>
+
+      <!-- ========== VALUATION BLOCK ========= -->
+      <div class="valuation-panel">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="section-title"><i class="bi bi-clipboard-check-fill"></i> Vehicle valuation</span>
+          <span class="badge bg-success bg-opacity-10 text-success px-4 py-2 rounded-pill">
+            <i class="bi bi-geo-alt-fill me-1"></i> On site
+          </span>
+        </div>
+        <p class="text-muted small mb-3">⚠️ Parameters dropdown/textbox se fill karein. Photos parameter ke according capture karein.</p>
+        
+        <!-- ===== PARAMETER SECTION - DROPDOWN + TEXTBOX ===== -->
+        <div class="parameter-card">
+          <h6 class="fw-bold mb-3" style="color: #0a3346;"><i class="bi bi-sliders2 me-2"></i>Vehicle Parameters</h6>
+          
+          <div class="row g-3">
+            <!-- Dropdown 1 -->
+            <div class="col-6 param-row">
+              <div class="param-label">Make Year</div>
+              <select id="paramMakeYear" class="form-select input-valuation">
+                <option value="">Select</option>
+                <option value="2018">2018</option>
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2021" selected>2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+              </select>
+            </div>
+            <!-- Textbox 1 -->
+            <div class="col-6 param-row">
+              <div class="param-label">KM Driven</div>
+              <input type="number" id="paramKm" class="input-valuation" placeholder="e.g., 42300" value="42300">
+            </div>
+            
+            <!-- Dropdown 2 -->
+            <div class="col-6 param-row">
+              <div class="param-label">Fuel Type</div>
+              <select id="paramFuel" class="form-select input-valuation">
+                <option value="">Select</option>
+                <option value="Petrol" selected>Petrol</option>
+                <option value="Diesel">Diesel</option>
+                <option value="CNG">CNG</option>
+                <option value="Electric">Electric</option>
+                <option value="Hybrid">Hybrid</option>
+              </select>
+            </div>
+            <!-- Textbox 2 -->
+            <div class="col-6 param-row">
+              <div class="param-label">Color</div>
+              <input type="text" id="paramColor" class="input-valuation" placeholder="e.g., Titan Grey" value="Titan Grey">
+            </div>
+            
+            <!-- Dropdown 3 -->
+            <div class="col-6 param-row">
+              <div class="param-label">Transmission</div>
+              <select id="paramTransmission" class="form-select input-valuation">
+                <option value="">Select</option>
+                <option value="Manual" selected>Manual</option>
+                <option value="Automatic">Automatic</option>
+                <option value="AMT">AMT</option>
+                <option value="CVT">CVT</option>
+              </select>
+            </div>
+            <!-- Textbox 3 -->
+            <div class="col-6 param-row">
+              <div class="param-label">Owner</div>
+              <input type="text" id="paramOwner" class="input-valuation" placeholder="1st, 2nd" value="2nd Owner">
+            </div>
+            
+            <!-- Dropdown 4 -->
+            <div class="col-6 param-row">
+              <div class="param-label">Insurance</div>
+              <select id="paramInsurance" class="form-select input-valuation">
+                <option value="">Select</option>
+                <option value="Yes" selected>Yes</option>
+                <option value="No">No</option>
+                <option value="Expired">Expired</option>
+              </select>
+            </div>
+            <!-- Textbox 4 (custom) -->
+            <div class="col-6 param-row">
+              <div class="param-label">RTO</div>
+              <input type="text" id="paramRto" class="input-valuation" placeholder="e.g., CH-01" value="CH-01">
+            </div>
+          </div>
+          
+          <!-- Extra custom parameter (textbox) -->
+          <div class="mt-2">
+            <div class="param-label">Additional Notes (optional)</div>
+            <input type="text" id="paramAdditional" class="input-valuation" placeholder="Any other detail..." value="Alloy wheels, sunroof">
+          </div>
+        </div>
+
+        <!-- ===== PHOTO CAPTURE - PARAMETER WISE ===== -->
+        <div class="photo-param-section">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="section-title" style="margin-bottom: 0;"><i class="bi bi-camera-fill"></i> Parameter wise photos</span>
+            <span class="badge-param"><i class="bi bi-info-circle"></i> Select type → Click photo</span>
+          </div>
+          
+          <!-- Parameter chips - active parameter select karo -->
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            <div class="param-chip active" data-param="Front View" onclick="setActiveParam(this, 'Front View')">
+              <i class="bi bi-car-front"></i> Front
+            </div>
+            <div class="param-chip" data-param="Back View" onclick="setActiveParam(this, 'Back View')">
+              <i class="bi bi-car-front" style="transform: rotate(180deg);"></i> Back
+            </div>
+            <div class="param-chip" data-param="Left Side" onclick="setActiveParam(this, 'Left Side')">
+              <i class="bi bi-arrow-left-square"></i> Left
+            </div>
+            <div class="param-chip" data-param="Right Side" onclick="setActiveParam(this, 'Right Side')">
+              <i class="bi bi-arrow-right-square"></i> Right
+            </div>
+            <div class="param-chip" data-param="Interior" onclick="setActiveParam(this, 'Interior')">
+              <i class="bi bi-grid"></i> Interior
+            </div>
+            <div class="param-chip" data-param="Engine" onclick="setActiveParam(this, 'Engine')">
+              <i class="bi bi-cpu"></i> Engine
+            </div>
+            <div class="param-chip" data-param="Dashboard" onclick="setActiveParam(this, 'Dashboard')">
+              <i class="bi bi-speedometer2"></i> Dashboard
+            </div>
+            <div class="param-chip" data-param="Tyres" onclick="setActiveParam(this, 'Tyres')">
+              <i class="bi bi-circle"></i> Tyres
+            </div>
+            <div class="param-chip" data-param="Damage" onclick="setActiveParam(this, 'Damage')">
+              <i class="bi bi-exclamation-triangle"></i> Damage
+            </div>
+          </div>
+          
+          <!-- Active parameter display and capture button -->
+          <div class="d-flex align-items-center justify-content-between bg-light p-3 rounded-4 mb-2">
+            <div>
+              <span class="fw-bold" style="color: #0a3346;">📸 Active parameter: </span>
+              <span id="activeParamLabel" class="fw-bold bg-dark text-white px-4 py-2 rounded-pill" style="background: #0f2e44 !important;">Front View</span>
+            </div>
+          </div>
+          
+          <!-- Camera button -->
+          <button class="media-btn" id="captureParameterPhotoBtn">
+            <i class="bi bi-camera-fill"></i> Capture photo for <span id="activeParamName">Front View</span>
+          </button>
+          
+          <!-- Hidden file input for parameter photo -->
+          <input type="file" id="paramPhotoInput" accept="image/*" capture="environment" class="hidden-input">
+          
+          <!-- Photo preview with parameter label -->
+          <div id="parameterPhotoPreview" class="thumbnail-preview">
+            <!-- Captured photos with parameter labels will appear here -->
+          </div>
+          <p class="note mt-2"><i class="bi bi-info-circle"></i> Har photo ke saath parameter save hoga. Mobile camera direct open hoga.</p>
+        </div>
+
+        <!-- Video Section (separate, no pause) -->
+        <div class="mt-4">
+          <div class="section-title"><i class="bi bi-camera-video-fill"></i> Video recording</div>
+          <button class="media-btn" id="captureVideoBtn" style="background: #1d4e5f;">
+            <i class="bi bi-camera-video-fill"></i> Record video
+          </button>
+          <!-- ✅ No pause - direct camcorder mode -->
+          <input type="file" id="videoInput" accept="video/*;capture=camcorder" capture="environment" class="hidden-input">
+          <div id="videoPreview" class="thumbnail-preview"></div>
+          <p class="note mt-1"><i class="bi bi-info-circle"></i> Direct recording, pause option nahi hai.</p>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- ===== REMARK SECTION ===== -->
+        <div class="remark-box mb-3">
+          <label class="fw-bold mb-2"><i class="bi bi-chat-dots-fill me-1"></i> Remark / Owner’s feedback</label>
+          <textarea id="valuationRemark" class="form-control border-0 bg-white shadow-none" rows="2" placeholder="Yahan likhe ... customer ne kya kaha? dents, accident, budget, etc." style="background: white; border-radius: 16px; padding: 12px;">Owner said he expects 5.2L, right door scratch</textarea>
+          <div class="d-flex justify-content-end mt-2">
+            <button class="btn btn-sm btn-primary rounded-pill px-4" onclick="saveRemark()">Save remark</button>
+          </div>
+        </div>
+
+        <!-- ===== ALTERNATE NUMBER SECTION ===== -->
+        <div class="alt-number-box">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-telephone-plus-fill fs-5 me-2" style="color: #0f5c7a;"></i>
+            <span class="fw-bold">Naya number? (customer ka alternate contact)</span>
+          </div>
+          <div class="row g-2 mt-2">
+            <div class="col-5">
+              <input type="text" class="form-control" id="altName" placeholder="Naam" value="Kavita (wife)">
+            </div>
+            <div class="col-5">
+              <input type="tel" class="form-control" id="altPhone" placeholder="Mobile number" value="98765 43219">
+            </div>
+            <div class="col-2 d-grid">
+              <button class="btn save-alt-btn" onclick="saveAlternateNumber()"><i class="bi bi-check-lg"></i></button>
+            </div>
+          </div>
+          <div id="altSuccessMsg" class="small text-success mt-1"></div>
+        </div>
+
+        <!-- FINAL SUBMIT -->
+        <div class="d-grid mt-4">
+          <button class="btn btn-lg text-white fw-semibold" style="background: #1a4e6b; border-radius: 40px; padding: 14px;" onclick="submitValuationReport()">
+            <i class="bi bi-check2-circle me-2"></i> Valuation complete — submit report
+          </button>
+        </div>
+      </div> <!-- /valuation panel -->
+      
+      <div class="text-center mt-4 text-secondary-emphasis small">
+        <i class="bi bi-envelope-paper"></i> Lead assigned by Admin · 12 Feb 2026
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======================================================
+    // ACTIVE PARAMETER FOR PHOTO CAPTURE
+    // ======================================================
+    let currentPhotoParam = 'Front View';
+    
+    function setActiveParam(element, paramName) {
+      // Remove active class from all chips
+      document.querySelectorAll('.param-chip').forEach(chip => {
+        chip.classList.remove('active');
+      });
+      // Add active class to clicked chip
+      element.classList.add('active');
+      // Update current param
+      currentPhotoParam = paramName;
+      document.getElementById('activeParamLabel').innerText = paramName;
+      document.getElementById('activeParamName').innerText = paramName;
+    }
+
+    // ======================================================
+    // PARAMETER WISE PHOTO CAPTURE
+    // ======================================================
+    document.getElementById('captureParameterPhotoBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Open camera with current parameter
+      let paramPhotoInput = document.getElementById('paramPhotoInput');
+      paramPhotoInput.click();
+    });
+
+    // Handle parameter photo capture
+    document.getElementById('paramPhotoInput').addEventListener('change', function(event) {
+      let files = event.target.files;
+      let previewContainer = document.getElementById('parameterPhotoPreview');
+      
+      for (let i = 0; i < files.length; i++) {
+        let file = files[i];
+        let reader = new FileReader();
+        let paramName = currentPhotoParam; // Current active parameter
+        let timestamp = new Date().toLocaleTimeString();
+        
+        reader.onload = function(e) {
+          // Create thumbnail item with parameter label
+          let thumbItem = document.createElement('div');
+          thumbItem.className = 'thumb-item';
+          
+          thumbItem.innerHTML = `
+            <img src="${e.target.result}" class="thumb-img" alt="Vehicle photo">
+            <div class="thumb-info">
+              <div class="thumb-param"><i class="bi bi-tag-fill me-1" style="color: #0f5c7a;"></i> ${paramName}</div>
+              <div class="thumb-time"><i class="bi bi-clock me-1"></i> ${timestamp}</div>
+            </div>
+            <button class="remove-thumb" onclick="this.parentElement.remove()">
+              <i class="bi bi-trash3"></i>
+            </button>
+          `;
+          
+          previewContainer.appendChild(thumbItem);
+        };
+        reader.readAsDataURL(file);
+      }
+      // Reset input
+      event.target.value = '';
+    });
+
+    // ======================================================
+    // VIDEO CAPTURE - NO PAUSE BUTTON
+    // ======================================================
+    document.getElementById('captureVideoBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('videoInput').click();
+    });
+
+    document.getElementById('videoInput').addEventListener('change', function(event) {
+      let files = event.target.files;
+      let previewContainer = document.getElementById('videoPreview');
+      
+      for (let i = 0; i < files.length; i++) {
+        let file = files[i];
+        let reader = new FileReader();
+        let timestamp = new Date().toLocaleTimeString();
+        
+        reader.onload = function(e) {
+          let thumbItem = document.createElement('div');
+          thumbItem.className = 'thumb-item';
+          
+          thumbItem.innerHTML = `
+            <video src="${e.target.result}" class="thumb-img" style="background: #000;"></video>
+            <div class="thumb-info">
+              <div class="thumb-param"><i class="bi bi-camera-video-fill me-1" style="color: #0f5c7a;"></i> Vehicle Video</div>
+              <div class="thumb-time"><i class="bi bi-clock me-1"></i> ${timestamp}</div>
+            </div>
+            <button class="remove-thumb" onclick="this.parentElement.remove()">
+              <i class="bi bi-trash3"></i>
+            </button>
+          `;
+          
+          previewContainer.appendChild(thumbItem);
+        };
+        reader.readAsDataURL(file);
+      }
+      event.target.value = '';
+    });
+
+    // ======================================================
+    // REMARK SAVE
+    // ======================================================
+    function saveRemark() {
+      let remarkText = document.getElementById('valuationRemark').value;
+      if (remarkText.trim() === '') {
+        alert('Kuch remark likhe!');
+      } else {
+        alert('✅ Remark saved: "' + remarkText + '"');
+      }
+    }
+
+    // ======================================================
+    // ALTERNATE NUMBER SAVE
+    // ======================================================
+    function saveAlternateNumber() {
+      let altName = document.getElementById('altName').value;
+      let altPhone = document.getElementById('altPhone').value;
+      if (altName && altPhone) {
+        document.getElementById('altSuccessMsg').innerHTML = '✔️ ' + altName + ' - ' + altPhone + ' saved as alternate contact';
+      } else {
+        alert('Naam aur number dono likhiye');
+      }
+    }
+
+    // ======================================================
+    // COLLECT ALL PARAMETERS & SUBMIT
+    // ======================================================
+    function submitValuationReport() {
+      // Collect all parameter values
+      let params = {
+        makeYear: document.getElementById('paramMakeYear').value,
+        kmDriven: document.getElementById('paramKm').value,
+        fuelType: document.getElementById('paramFuel').value,
+        color: document.getElementById('paramColor').value,
+        transmission: document.getElementById('paramTransmission').value,
+        owner: document.getElementById('paramOwner').value,
+        insurance: document.getElementById('paramInsurance').value,
+        rto: document.getElementById('paramRto').value,
+        additional: document.getElementById('paramAdditional').value
+      };
+      
+      let photoCount = document.getElementById('parameterPhotoPreview').children.length;
+      let videoCount = document.getElementById('videoPreview').children.length;
+      let remark = document.getElementById('valuationRemark').value;
+      let altName = document.getElementById('altName').value;
+      let altPhone = document.getElementById('altPhone').value;
+      
+      let summary = `📋 VALUATION REPORT
+━━━━━━━━━━━━━━━
+🚗 Vehicle: Hyundai i20 2021
+📅 Year: ${params.makeYear}
+⛽ Fuel: ${params.fuelType}
+📊 KM: ${params.kmDriven}
+🎨 Color: ${params.color}
+⚙️ Transmission: ${params.transmission}
+👤 Owner: ${params.owner}
+🛡️ Insurance: ${params.insurance}
+📍 RTO: ${params.rto}
+📝 Additional: ${params.additional}
+
+📸 Parameter photos: ${photoCount}
+🎥 Videos: ${videoCount}
+💬 Remark: ${remark}
+👥 Alternate: ${altName} - ${altPhone}
+
+✅ Report ready for sync!`;
+      
+      alert(summary);
+    }
+
+    // ======================================================
+    // INITIAL SETUP
+    // ======================================================
+    window.onload = function() {
+      document.getElementById('altSuccessMsg').innerHTML = '✔️ Kavita - 98765 43219 saved as alternate contact';
+      
+      // Set default active parameter
+      let defaultChip = document.querySelector('.param-chip[data-param="Front View"]');
+      if (defaultChip) {
+        defaultChip.classList.add('active');
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
